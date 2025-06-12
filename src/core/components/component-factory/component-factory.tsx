@@ -2,8 +2,14 @@ import Rating from "@/core/atoms/rating";
 import { VStack, HStack } from "@/core/atoms/stack";
 import Text from "@/core/atoms/text";
 import Title from "@/core/atoms/title";
-import { JSX, ReactNode } from "react";
-import { PropsMap, ComponentConfig, DynamicProductCardProps } from "../typing";
+import React, { JSX, ReactNode } from "react";
+import {
+  PropsMap,
+  ComponentConfig,
+  DynamicProductCardProps,
+  VStackContainerProps,
+  HStackContainerProps,
+} from "../typing";
 import Image from "@/core/atoms/image";
 import Price from "@/core/atoms/price";
 import Divider from "@/core/atoms/divider";
@@ -30,8 +36,34 @@ const componentMap: Record<string, ComponentRenderer> = {
   price: mapComponent(Price),
   rating: mapComponent(Rating),
   image: mapComponent(Image),
-  vstack: mapComponent(VStack),
-  hstack: mapComponent(HStack),
+  vstack: (props) => {
+    const { children, ...rest } = props as VStackContainerProps;
+    return (
+      <VStack {...rest}>
+        {Array.isArray(children) ? (
+          children.map((child, i) => (
+            <RenderComponent key={i} component={child} />
+          ))
+        ) : (
+          <RenderComponent component={children} />
+        )}
+      </VStack>
+    );
+  },
+  hstack: (props) => {
+    const { children, ...rest } = props as HStackContainerProps;
+    return (
+      <HStack {...rest}>
+        {Array.isArray(children) ? (
+          children.map((child, i) => (
+            <RenderComponent key={i} component={child} />
+          ))
+        ) : (
+          <RenderComponent component={children} />
+        )}
+      </HStack>
+    );
+  },
   divider: mapComponent(Divider),
   icon: mapComponent(Icon),
   productCard: (props) => {
@@ -62,7 +94,18 @@ export const RenderComponent = ({
   component: ComponentConfig | ReactNode;
 }) => {
   if (!isComponentConfig(component)) {
-    return <>{component}</>;
+    if (
+      component === null ||
+      component === undefined ||
+      typeof component === "string" ||
+      typeof component === "number" ||
+      typeof component === "boolean" ||
+      React.isValidElement(component)
+    ) {
+      return <>{component}</>;
+    }
+    console.error("Invalid React child:", component);
+    return null;
   }
 
   const { type, props } = component;

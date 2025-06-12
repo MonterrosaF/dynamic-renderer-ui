@@ -18,12 +18,12 @@ export interface ImageProps extends BaseProps {
 
 export interface VStackContainerProps
   extends Omit<VStackProps<"div">, "children"> {
-  children: ComponentConfig[];
+  children: ComponentConfig | ComponentConfig[];
 }
 
 export interface HStackContainerProps
   extends Omit<HStackProps<"div">, "children"> {
-  children: ComponentConfig[];
+  children: ComponentConfig | ComponentConfig[];
 }
 
 interface WishlistIconProps {
